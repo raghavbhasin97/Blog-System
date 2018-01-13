@@ -12,12 +12,16 @@ var flash = require('connect-flash');
 var moment = require('moment');
 var expressValidator = require('express-validator');
 var monk = require('monk');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var bcrypt = require('bcryptjs');
 
 
 var db = monk('localhost/nodeblog')
 
 var index = require('./routes/index');
 var posts = require('./routes/posts');
+var users = require('./routes/users');
 
 var app = express();
 
@@ -34,6 +38,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //Middleware setup
+
 app.use(flash());
 app.use(function (req, res, next) {
   res.locals.messages = require('express-messages')(req, res);
@@ -44,6 +49,7 @@ app.locals.moment = moment;
 app.locals.trim = function(text) {
   return text.substring(0,400);
 }
+app.locals.cwd = __dirname + "/public/";
 // Handle Sessions
 app.use(session({
   secret:'secret',
@@ -51,6 +57,9 @@ app.use(session({
   resave: true
 }));
 
+
+app.use(passport.initialize());
+app.use(passport.session());
 // Validator
 app.use(expressValidator({
   errorFormatter: function(param, msg, value) {
@@ -69,7 +78,10 @@ app.use(expressValidator({
   }
 }));
 
-
+app.get('*',function(req,res,next){
+  res.locals.user = req.user || null;
+  next();
+})
 //DB variable
 app.use(function(req, res, next) {
   req.db = db;
@@ -77,6 +89,7 @@ app.use(function(req, res, next) {
 });
 app.use('/', index);
 app.use('/posts', posts);
+app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

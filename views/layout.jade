@@ -12,6 +12,13 @@ html
        a(href='/') Home
       li
        a(href='/posts/add') Add Post
+      if user
+       li
+        a(href = '/posts/author/#{user.name}') My Posts
+      .logout
+       if user
+        li 
+         a(href = '/users/logout') Logout
     != messages()
     block content
     footer

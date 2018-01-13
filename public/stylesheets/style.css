@@ -129,3 +129,60 @@ ul.success li{
   	border-color: #d6e9c6;
   	list-style:none;
 }
+
+ul.error li {
+	padding:15px;
+	margin-top:10px;
+	margin-bottom:20px;
+	border:1px solid transparent;
+	border-radius:4px;
+	color:#a94442;
+	background-color: #f2dede;
+	border-color:#ebccd1;
+	list-style:none;
+}
+
+.alert {
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+
+div
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert-danger hr {
+  border-top-color: #f1b0b7;
+}
+
+.alert-danger .alert-link {
+  color: #491217;
+}
+
+
+
+.logout li{
+	position: absolute;
+    right: 20px;
+    width: 200px;
+    height: 120px;
+    
+}
+div .remove a{
+
+	margin-top:10px;
+	position: absolute;
+    right: 130px;
+    width: 80px;
+    height: 25px;
+    text-decoration: none;
+    color: red;
+   
+
+}

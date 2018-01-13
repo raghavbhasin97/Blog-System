@@ -4,8 +4,9 @@ var multer = require('multer');
 var upload = multer({dest:'./public/images/'});
 var mongo = require('mongodb');
 var db = require('monk')('localhost/nodeblog');
+var fs = require('fs');
 
-router.get('/add', function(req, res, next) {
+router.get('/add',ensureAuthenticated ,function(req, res, next) {
 	var categories = db.get('categories');
 	categories.find({},{}, function(err,categories){
 		  res.render('addpost',{title:'Add Post', categories:categories});
@@ -14,19 +15,30 @@ router.get('/add', function(req, res, next) {
 });
 
 
+router.get('/remove/:id/:filename',ensureAuthenticated ,function(req, res, next) {
+	var id = req.params.id;
+	var filename = req.params.filename;
+	var posts = db.get('posts');
+	fs.unlinkSync(req.app.locals.cwd + "images/" + filename);
+	posts.remove({_id:id});
+	res.location('/');
+    res.redirect('/');
 
-router.get('/show/:id', function(req, res, next) {
+});
+
+
+router.get('/show/:id', ensureAuthenticated,function(req, res, next) {
 	var id = req.params.id;
 	var posts = db.get('posts');
 	posts.find({_id:id},{}, function(err,post){
 		  post = post[0];
-		  res.render('showPost',{title:'Article | ' + post.title.substring(0,10), post:post});
+		  res.render('showPost',{title:'Article | ' + post.title.substring(0,10)+"...", post:post});
 	});	
 
 });
 
 
-router.get('/categories/:cat', function(req, res, next) {
+router.get('/categories/:cat', ensureAuthenticated,function(req, res, next) {
 	var cat = req.params.cat;
 	var posts = db.get('posts');
 	posts.find({category:cat},{}, function(err,posts){
@@ -36,7 +48,7 @@ router.get('/categories/:cat', function(req, res, next) {
 });
 
 
-router.get('/author/:author', function(req, res, next) {
+router.get('/author/:author', ensureAuthenticated,function(req, res, next) {
 	var author = req.params.author;
 	var posts = db.get('posts');
 	posts.find({author:author},{}, function(err,posts){
@@ -91,5 +103,15 @@ router.post('/add', upload.single('mainimage'),function(req, res, next) {
  	});
  }
 });
+
+
+function ensureAuthenticated(req,res,next) {
+	if(req.isAuthenticated())
+	{
+		return next();
+	} else {
+		res.redirect('/users/login');
+	}
+};
 
 module.exports = router;

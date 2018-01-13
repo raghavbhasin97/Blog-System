@@ -1,6 +1,9 @@
 extends layout
 
 block content
+    if post.author == user.name
+      .remove
+        a(href = '/posts/remove/#{post._id}/#{post.mainimage}') Remove
     .post
      h1=post.title
      p.meta Posted in 

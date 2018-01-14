@@ -114,4 +114,51 @@ function ensureAuthenticated(req,res,next) {
 	}
 };
 
+
+router.post('/addcomment',ensureAuthenticated,function(req, res, next) {
+	 var postid = req.body.postid;
+	 var name = req.body.name;
+	 var body = req.body.body;
+ 	 var commentdate = new Date();
+	 var posts = db.get('posts');
+
+	req.checkBody('body', 'Body field is required').notEmpty();
+
+	// Check Errors
+	var errors = req.validationErrors();
+
+	if(errors){
+				req.flash('error', 'Comment without body can\'t be added');
+				res.location('/posts/show/'+postid);
+				res.redirect('/posts/show/'+postid);
+	} else {
+		var comment = {
+			"name": name,
+			"body": body,
+			"commentdate": commentdate
+		}
+
+		var posts = db.get('posts');
+
+		posts.update({
+			"_id": postid
+		},{
+			$push:{
+				"comments": comment
+			}
+		}, function(err, doc){
+			if(err){
+				throw err;
+			} else {
+				req.flash('success', 'Comment Added');
+				res.location('/posts/show/'+postid);
+				res.redirect('/posts/show/'+postid);
+			}
+		});
+	}
+
+});
+
+
+
 module.exports = router;
